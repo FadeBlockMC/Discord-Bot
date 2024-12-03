@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, Collection } = require("discord.js");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("help")
-    .setDescription("List all of my commands or info about a specific command."),
+    .setDescription("List of all my commands."),
   async execute(interaction) {
     const commands = interaction.client.commands;
     const helpCommands = new Collection();

@@ -7,7 +7,7 @@ const {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("say")
-    .setDescription("Make Nexy say something.")
+    .setDescription("Put your message in an embed.")
     .addStringOption((option) =>
       option
         .setName("title")
@@ -17,7 +17,7 @@ module.exports = {
     .addStringOption((option) =>
       option
         .setName("message")
-        .setDescription("The message that Nexy will say.")
+        .setDescription("The message you want to say")
         .setRequired(true)
     ),
   async execute(interaction) {

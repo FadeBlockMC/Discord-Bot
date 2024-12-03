@@ -15,7 +15,6 @@ module.exports = {
       .setTitle(shark.title)
       .setDescription(shark.story)
       .setTimestamp()
-      .setFooter({ text: "https://github.com/Nexy-Development/Nexy" });
     
     await interaction.reply({ embeds: [sharkEmbed] });
   },
