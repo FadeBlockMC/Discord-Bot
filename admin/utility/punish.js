@@ -34,6 +34,12 @@ module.exports = {
         .setName("duration")
         .setDescription("The duration of the punishment.")
         .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("evidence")
+        .setDescription("Provide a link to evidence")
+        .setRequired(true)
     ),
 
   async execute(interaction) {
@@ -42,13 +48,18 @@ module.exports = {
       punishment: interaction.options.getString("punishment"),
       duration: interaction.options.getString("duration"),
       reason: interaction.options.getString("reason"),
+      evidence: interaction.options.getString("evidence"),
     };
 
     const punishEmbed = new EmbedBuilder()
       .setTitle("Punishment")
       .setColor("#ff0000")
       .setDescription(
-        `**The user **${punishmentDetails.user}\n **has been** ${punishmentDetails.punishment}\n **for** ${punishmentDetails.duration}\n **for the reason**: ${punishmentDetails.reason}`
+        `**User:** ${punishmentDetails.user}\n` +
+          `**Punishment:** ${punishmentDetails.punishment}\n` +
+          `**Duration:** ${punishmentDetails.duration}\n` +
+          `**Reason:** ${punishmentDetails.reason}\n` +
+          `**Evidence:** ${punishmentDetails.evidence}`
       )
       .setFooter({ text: "Punished by " + interaction.user.tag });
 
