@@ -22,7 +22,7 @@ module.exports = {
       .setTitle("Nexy Commands")
       .addFields(helpFields)
       .setTimestamp()
-      .setFooter({ text: "https://github.com/Nexy-Development/Nexy" });
+      .setFooter({ text: "https://github.com/FadeBlockMC/server-status" });
 
     await interaction.reply({ embeds: [helpEmbed] });
   },
