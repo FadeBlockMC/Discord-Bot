@@ -1,8 +1,9 @@
-const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder } = require("discord.js");
+const { PermissionsBitField, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("MCPunish")
+    .setName("mc-punish")
     .setDescription("Punish a user.")
     .addUserOption((option) =>
       option
@@ -22,7 +23,6 @@ module.exports = {
         .setDescription("The type of punishment.")
         .setRequired(true)
         .addChoices(
-          { name: "Muted", value: "Muted" },
           { name: "Kicked", value: "Kicked" },
           { name: "Banned", value: "Banned" },
           { name: "Warned", value: "Warned" }
@@ -51,7 +51,7 @@ module.exports = {
     };
 
     const punishEmbed = new EmbedBuilder()
-      .setTitle("Punishment")
+      .setTitle("MC Punishment")
       .setColor("#ff0000")
       .setDescription(
         `**User:** ${punishmentDetails.user}\n` +

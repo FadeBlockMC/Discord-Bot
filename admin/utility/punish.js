@@ -29,7 +29,7 @@ module.exports = {
     .addStringOption((option) =>
       option
         .setName("duration")
-        .setDescription("Duration for mutes or warnings (e.g., 10m, 1h, 2d).")
+        .setDescription("Duration for mutes, warnings or bans")
     ),
   async execute(interaction) {
     if (
@@ -54,47 +54,12 @@ module.exports = {
 
     if (!logChannel) {
       return interaction.reply({
-        content:
-          "Log channel not found. Please create a channel named 'discord-logs'.",
+        content: "You do not have permission to use this command.",
         ephemeral: true,
       });
     }
 
     let logEmbed;
-
-    if (punishment === "Warned") {
-      logEmbed = new EmbedBuilder()
-        .setTitle("User Warned")
-        .setColor("#ffcc00")
-        .setDescription(
-          `**Warned User**: ${user.tag}\n**Reason**: ${reason}\n**Duration**: ${
-            duration || "indefinite"
-          }`
-        )
-        .setFooter({ text: `Warned by ${interaction.user.tag}` });
-
-      logChannel.send({ embeds: [logEmbed] });
-
-      try {
-        await user.send(
-          `You have been warned in **${
-            interaction.guild.name
-          }**.\n**Reason**: ${reason}\n**Duration**: ${
-            duration || "indefinite"
-          }`
-        );
-      } catch {
-        interaction.followUp({
-          content: `Could not DM ${user.tag} about their warning.`,
-          ephemeral: true,
-        });
-      }
-
-      return interaction.reply({
-        content: `${user.tag} has been warned successfully.`,
-        ephemeral: true,
-      });
-    }
 
     if (punishment === "Muted") {
       const muteRole = interaction.guild.roles.cache.find(
@@ -131,7 +96,7 @@ module.exports = {
             }`
           );
         } catch {
-          interaction.followUp({
+          interaction.reply({
             content: `Could not DM ${user.tag} about their mute.`,
             ephemeral: true,
           });
@@ -144,70 +109,91 @@ module.exports = {
       }
     }
 
-    if (punishment === "Kicked") {
-      if (member) {
-        try {
+    try {
+      if (punishment === "Warned") {
+        logEmbed = new EmbedBuilder()
+          .setTitle("User Warned")
+          .setColor("#ffcc00")
+          .setDescription(
+            `**Warned User**: ${
+              user.tag
+            }\n**Reason**: ${reason}\n**Duration**: ${duration || "indefinite"}`
+          )
+          .setFooter({ text: `Warned by ${interaction.user.tag}` });
+
+        logChannel.send({ embeds: [logEmbed] });
+
+        await user.send(
+          `You have been warned in **${
+            interaction.guild.name
+          }**.\n**Reason**: ${reason}\n**Duration**: ${
+            duration || "indefinite"
+          }`
+        );
+
+        return interaction.reply({
+          content: `${user.tag} has been warned successfully.`,
+        });
+      }
+
+      if (punishment === "Kicked") {
+        if (member) {
           await user.send(
             `You have been kicked from **${interaction.guild.name}**.\n**Reason**: ${reason}`
           );
-        } catch {
-          interaction.followUp({
-            content: `Could not DM ${user.tag} about their kick.`,
-            ephemeral: true,
+
+          await member.kick(reason);
+
+          logEmbed = new EmbedBuilder()
+            .setTitle("User Kicked")
+            .setColor("#ff3300")
+            .setDescription(
+              `**Kicked User**: ${user.tag}\n**Reason**: ${reason}`
+            )
+            .setFooter({ text: `Kicked by ${interaction.user.tag}` });
+
+          logChannel.send({ embeds: [logEmbed] });
+
+          return interaction.editReply({
+            content: `${user.tag} has been kicked successfully.`,
           });
         }
-
-        await member.kick(reason);
-
-        logEmbed = new EmbedBuilder()
-          .setTitle("User Kicked")
-          .setColor("#ff3300")
-          .setDescription(`**Kicked User**: ${user.tag}\n**Reason**: ${reason}`)
-          .setFooter({ text: `Kicked by ${interaction.user.tag}` });
-
-        logChannel.send({ embeds: [logEmbed] });
-
-        return interaction.reply({
-          content: `${user.tag} has been kicked successfully.`,
-          ephemeral: true,
-        });
       }
-    }
 
-    if (punishment === "Banned") {
-      if (member) {
-        try {
+      if (punishment === "Banned") {
+        if (member) {
           await user.send(
             `You have been banned from **${interaction.guild.name}**.\n**Reason**: ${reason}`
           );
-        } catch {
-          interaction.followUp({
-            content: `Could not DM ${user.tag} about their ban.`,
-            ephemeral: true,
+
+          await member.ban({ reason });
+
+          logEmbed = new EmbedBuilder()
+            .setTitle("User Banned")
+            .setColor("#ff0000")
+            .setDescription(
+              `**Banned User**: ${user.tag}\n**Reason**: ${reason}`
+            )
+            .setFooter({ text: `Banned by ${interaction.user.tag}` });
+
+          logChannel.send({ embeds: [logEmbed] });
+
+          return interaction.reply({
+            content: `${user.tag} has been banned successfully.`,
           });
         }
-
-        await member.ban({ reason });
-
-        logEmbed = new EmbedBuilder()
-          .setTitle("User Banned")
-          .setColor("#ff0000")
-          .setDescription(`**Banned User**: ${user.tag}\n**Reason**: ${reason}`)
-          .setFooter({ text: `Banned by ${interaction.user.tag}` });
-
-        logChannel.send({ embeds: [logEmbed] });
-
-        return interaction.reply({
-          content: `${user.tag} has been banned successfully.`,
-          ephemeral: true,
-        });
       }
-    }
 
-    return interaction.reply({
-      content:
-        "Action could not be completed. Check if the user is in the server.",
-      ephemeral: true,
-    });
+      return interaction.reply({
+        content:
+          "Action could not be completed. Check if the user is in the server.",
+      });
+    } catch (error) {
+      console.error(error);
+
+      return interaction.reply({
+        content: "An error occurred while executing the command.",
+      });
+    }
   },
 };
