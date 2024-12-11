@@ -88,13 +88,7 @@ module.exports = {
         logChannel.send({ embeds: [logEmbed] });
 
         try {
-          await user.send(
-            `You have been muted in **${
-              interaction.guild.name
-            }**.\n**Reason**: ${reason}\n**Duration**: ${
-              duration || "indefinite"
-            }`
-          );
+          await user.send({ embeds: [logEmbed] });
         } catch {
           interaction.reply({
             content: `Could not DM ${user.tag} about their mute.`,
@@ -117,30 +111,25 @@ module.exports = {
           .setDescription(
             `**Warned User**: ${
               user.tag
-            }\n**Reason**: ${reason}\n**Duration**: ${duration || "indefinite"}`
+            }\n**Reason**: ${reason}\n**Total warns**: ${
+              duration || "Work in progress"
+            }`
           )
           .setFooter({ text: `Warned by ${interaction.user.tag}` });
 
         logChannel.send({ embeds: [logEmbed] });
 
-        await user.send(
-          `You have been warned in **${
-            interaction.guild.name
-          }**.\n**Reason**: ${reason}\n**Duration**: ${
-            duration || "indefinite"
-          }`
-        );
+        await user.send({ embeds: [logEmbed] });
 
         return interaction.reply({
           content: `${user.tag} has been warned successfully.`,
+          ephemeral: true,
         });
       }
 
       if (punishment === "Kicked") {
         if (member) {
-          await user.send(
-            `You have been kicked from **${interaction.guild.name}**.\n**Reason**: ${reason}`
-          );
+          await user.send({ embeds: [logEmbed] });
 
           await member.kick(reason);
 
@@ -154,18 +143,15 @@ module.exports = {
 
           logChannel.send({ embeds: [logEmbed] });
 
-          return interaction.editReply({
+          return interaction.reply({
             content: `${user.tag} has been kicked successfully.`,
+            ephemeral: true,
           });
         }
       }
 
       if (punishment === "Banned") {
         if (member) {
-          await user.send(
-            `You have been banned from **${interaction.guild.name}**.\n**Reason**: ${reason}`
-          );
-
           await member.ban({ reason });
 
           logEmbed = new EmbedBuilder()
@@ -183,6 +169,8 @@ module.exports = {
           });
         }
       }
+
+      await user.send({ embeds: [logEmbed] });
 
       return interaction.reply({
         content:
