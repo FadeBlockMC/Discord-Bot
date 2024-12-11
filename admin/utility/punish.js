@@ -8,19 +8,13 @@ module.exports = {
     .addUserOption((option) =>
       option
         .setName("user")
-        .setDescription("The user you want to punish.")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("reason")
-        .setDescription("The reason for the punishment.")
+        .setDescription("The user to punish.")
         .setRequired(true)
     )
     .addStringOption((option) =>
       option
         .setName("punishment")
-        .setDescription("The type of punishment.")
+        .setDescription("The punishment type.")
         .setRequired(true)
         .addChoices(
           { name: "Muted", value: "Muted" },
@@ -30,50 +24,190 @@ module.exports = {
         )
     )
     .addStringOption((option) =>
-      option
-        .setName("duration")
-        .setDescription("The duration of the punishment.")
-        .setRequired(true)
+      option.setName("reason").setDescription("The reason.").setRequired(true)
     )
     .addStringOption((option) =>
       option
-        .setName("evidence")
-        .setDescription("Provide a link to evidence")
-        .setRequired(true)
+        .setName("duration")
+        .setDescription("Duration for mutes or warnings (e.g., 10m, 1h, 2d).")
     ),
-
   async execute(interaction) {
-    const punishmentDetails = {
-      user: interaction.options.getUser("user").tag,
-      punishment: interaction.options.getString("punishment"),
-      duration: interaction.options.getString("duration"),
-      reason: interaction.options.getString("reason"),
-      evidence: interaction.options.getString("evidence"),
-    };
-
-    const punishEmbed = new EmbedBuilder()
-      .setTitle("Punishment")
-      .setColor("#ff0000")
-      .setDescription(
-        `**User:** ${punishmentDetails.user}\n` +
-          `**Punishment:** ${punishmentDetails.punishment}\n` +
-          `**Duration:** ${punishmentDetails.duration}\n` +
-          `**Reason:** ${punishmentDetails.reason}\n` +
-          `**Evidence:** ${punishmentDetails.evidence}`
-      )
-      .setFooter({ text: "Punished by " + interaction.user.tag });
-
     if (
       !interaction.member.permissions.has(
         PermissionsBitField.Flags.Administrator
       )
     ) {
-      return await interaction.reply({
+      return interaction.reply({
         content: "You do not have permission to use this command.",
         ephemeral: true,
       });
     }
 
-    await interaction.reply({ embeds: [punishEmbed] });
+    const user = interaction.options.getUser("user");
+    const punishment = interaction.options.getString("punishment");
+    const reason = interaction.options.getString("reason");
+    const duration = interaction.options.getString("duration");
+    const member = interaction.guild.members.cache.get(user.id);
+    const logChannel = interaction.guild.channels.cache.find(
+      (channel) => channel.name === "discord-logs"
+    );
+
+    if (!logChannel) {
+      return interaction.reply({
+        content:
+          "Log channel not found. Please create a channel named 'discord-logs'.",
+        ephemeral: true,
+      });
+    }
+
+    let logEmbed;
+
+    if (punishment === "Warned") {
+      logEmbed = new EmbedBuilder()
+        .setTitle("User Warned")
+        .setColor("#ffcc00")
+        .setDescription(
+          `**Warned User**: ${user.tag}\n**Reason**: ${reason}\n**Duration**: ${
+            duration || "indefinite"
+          }`
+        )
+        .setFooter({ text: `Warned by ${interaction.user.tag}` });
+
+      logChannel.send({ embeds: [logEmbed] });
+
+      try {
+        await user.send(
+          `You have been warned in **${
+            interaction.guild.name
+          }**.\n**Reason**: ${reason}\n**Duration**: ${
+            duration || "indefinite"
+          }`
+        );
+      } catch {
+        interaction.followUp({
+          content: `Could not DM ${user.tag} about their warning.`,
+          ephemeral: true,
+        });
+      }
+
+      return interaction.reply({
+        content: `${user.tag} has been warned successfully.`,
+        ephemeral: true,
+      });
+    }
+
+    if (punishment === "Muted") {
+      const muteRole = interaction.guild.roles.cache.find(
+        (role) => role.name === "Muted"
+      );
+
+      if (!muteRole) {
+        return interaction.reply({
+          content: "Muted role not found. Please create a role named 'Muted'.",
+          ephemeral: true,
+        });
+      }
+
+      if (member) {
+        await member.roles.add(muteRole);
+        logEmbed = new EmbedBuilder()
+          .setTitle("User Muted")
+          .setColor("#ff9900")
+          .setDescription(
+            `**Muted User**: ${
+              user.tag
+            }\n**Reason**: ${reason}\n**Duration**: ${duration || "indefinite"}`
+          )
+          .setFooter({ text: `Muted by ${interaction.user.tag}` });
+
+        logChannel.send({ embeds: [logEmbed] });
+
+        try {
+          await user.send(
+            `You have been muted in **${
+              interaction.guild.name
+            }**.\n**Reason**: ${reason}\n**Duration**: ${
+              duration || "indefinite"
+            }`
+          );
+        } catch {
+          interaction.followUp({
+            content: `Could not DM ${user.tag} about their mute.`,
+            ephemeral: true,
+          });
+        }
+
+        return interaction.reply({
+          content: `${user.tag} has been muted successfully.`,
+          ephemeral: true,
+        });
+      }
+    }
+
+    if (punishment === "Kicked") {
+      if (member) {
+        try {
+          await user.send(
+            `You have been kicked from **${interaction.guild.name}**.\n**Reason**: ${reason}`
+          );
+        } catch {
+          interaction.followUp({
+            content: `Could not DM ${user.tag} about their kick.`,
+            ephemeral: true,
+          });
+        }
+
+        await member.kick(reason);
+
+        logEmbed = new EmbedBuilder()
+          .setTitle("User Kicked")
+          .setColor("#ff3300")
+          .setDescription(`**Kicked User**: ${user.tag}\n**Reason**: ${reason}`)
+          .setFooter({ text: `Kicked by ${interaction.user.tag}` });
+
+        logChannel.send({ embeds: [logEmbed] });
+
+        return interaction.reply({
+          content: `${user.tag} has been kicked successfully.`,
+          ephemeral: true,
+        });
+      }
+    }
+
+    if (punishment === "Banned") {
+      if (member) {
+        try {
+          await user.send(
+            `You have been banned from **${interaction.guild.name}**.\n**Reason**: ${reason}`
+          );
+        } catch {
+          interaction.followUp({
+            content: `Could not DM ${user.tag} about their ban.`,
+            ephemeral: true,
+          });
+        }
+
+        await member.ban({ reason });
+
+        logEmbed = new EmbedBuilder()
+          .setTitle("User Banned")
+          .setColor("#ff0000")
+          .setDescription(`**Banned User**: ${user.tag}\n**Reason**: ${reason}`)
+          .setFooter({ text: `Banned by ${interaction.user.tag}` });
+
+        logChannel.send({ embeds: [logEmbed] });
+
+        return interaction.reply({
+          content: `${user.tag} has been banned successfully.`,
+          ephemeral: true,
+        });
+      }
+    }
+
+    return interaction.reply({
+      content:
+        "Action could not be completed. Check if the user is in the server.",
+      ephemeral: true,
+    });
   },
 };
