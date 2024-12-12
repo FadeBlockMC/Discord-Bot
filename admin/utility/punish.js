@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { PermissionsBitField, EmbedBuilder } = require("discord.js");
+const ms = require("ms");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -80,10 +81,10 @@ module.exports = {
           .setColor("#ff9900")
           .setDescription(
             `**Muted User**: ${
-              user.tag
+              `<@${user.id}>`
             }\n**Reason**: ${reason}\n**Duration**: ${duration || "indefinite"}`
           )
-          .setFooter({ text: `Muted by ${interaction.user.tag}` });
+          .setFooter({ text: `Muted by <@${interaction.user.id}>` });
 
         logChannel.send({ embeds: [logEmbed] });
 
@@ -95,6 +96,10 @@ module.exports = {
             ephemeral: true,
           });
         }
+
+        setTimeout(() => {
+          member.roles.remove(muteRole);
+        }, duration ? ms(duration) : 0) 
 
         return interaction.reply({
           content: `${user.tag} has been muted successfully.`,
