@@ -80,9 +80,10 @@ module.exports = {
           .setTitle("User Muted")
           .setColor("#ff9900")
           .setDescription(
-            `**Muted User**: ${
-              `<@${user.id}>`
-            }\n**Reason**: ${reason}\n**Duration**: ${duration || "indefinite"}`
+            `**Muted User**: ${`<@${user.id}>`}\n**Reason**: ${reason}\n**Duration**: ${
+              duration ||
+              "No duration given\n"`**Muted by** <@${interaction.user.id}>`
+            }`
           )
           .setFooter({ text: `Muted by <@${interaction.user.id}>` });
 
@@ -97,9 +98,12 @@ module.exports = {
           });
         }
 
-        setTimeout(() => {
-          member.roles.remove(muteRole);
-        }, duration ? ms(duration) : 0) 
+        setTimeout(
+          () => {
+            member.roles.remove(muteRole);
+          },
+          duration ? ms(duration) : 0
+        );
 
         return interaction.reply({
           content: `${user.tag} has been muted successfully.`,
@@ -114,13 +118,12 @@ module.exports = {
           .setTitle("User Warned")
           .setColor("#ffcc00")
           .setDescription(
-            `**Warned User**: ${
-              user.tag
-            }\n**Reason**: ${reason}\n**Total warns**: ${
-              duration || "Work in progress"
+            `**Muted User**: ${`<@${user.id}>`}\n**Reason**: ${reason}\n**Duration**: ${
+              duration ||
+              "No duration given\n"`**Muted by** <@${interaction.user.id}>`
             }`
           )
-          .setFooter({ text: `Warned by ${interaction.user.tag}` });
+          .setFooter({ text: `Warned by <@${interaction.user.id}>` });
 
         logChannel.send({ embeds: [logEmbed] });
 
@@ -142,9 +145,9 @@ module.exports = {
             .setTitle("User Kicked")
             .setColor("#ff3300")
             .setDescription(
-              `**Kicked User**: ${user.tag}\n**Reason**: ${reason}`
+              `**Kicked User**:<@${user.id}>\n**Reason**: ${reason}\n**Muted by** <@${interaction.user.id}>`
             )
-            .setFooter({ text: `Kicked by ${interaction.user.tag}` });
+            .setFooter({ text: `Kicked by <@${interaction.user.id}>` });
 
           logChannel.send({ embeds: [logEmbed] });
 
@@ -163,9 +166,9 @@ module.exports = {
             .setTitle("User Banned")
             .setColor("#ff0000")
             .setDescription(
-              `**Banned User**: ${user.tag}\n**Reason**: ${reason}`
+              `**Banned User**:<@${user.id}>\n**Reason**: ${reason}\n**Banned by** <@${interaction.user.id}>`
             )
-            .setFooter({ text: `Banned by ${interaction.user.tag}` });
+            .setFooter({ text: `Banned by <@${interaction.user.id}>` });
 
           logChannel.send({ embeds: [logEmbed] });
 
