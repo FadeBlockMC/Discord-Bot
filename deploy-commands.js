@@ -71,9 +71,9 @@ const rest = new REST({ version: "10" }).setToken(token);
     );
 
     // Deploy all commands in one bulk update
-    const data = await rest.put(Routes.applicationCommands(clientId), {
+        const data = await rest.put(Routes.applicationCommands(clientId), {
       body: commands,
-    });
+        });
 
     console.log(
       `Successfully reloaded ${data.length} application (/) commands.`

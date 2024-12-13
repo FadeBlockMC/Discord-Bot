@@ -30,22 +30,22 @@ module.exports = {
     )
     .addStringOption((option) =>
       option
-        .setName("duration")
-        .setDescription("The duration of the punishment.")
+        .setName("evidence")
+        .setDescription("Provide a link to evidence")
         .setRequired(true)
     )
     .addStringOption((option) =>
       option
-        .setName("evidence")
-        .setDescription("Provide a link to evidence")
-        .setRequired(true)
+        .setName("duration")
+        .setDescription("The duration of the punishment.")
+        .setRequired(false)
     ),
 
   async execute(interaction) {
     const punishmentDetails = {
       user: interaction.options.getUser("user").tag,
       punishment: interaction.options.getString("punishment"),
-      duration: interaction.options.getString("duration"),
+      duration: interaction.options.getString("duration") || "Not specified",
       reason: interaction.options.getString("reason"),
       evidence: interaction.options.getString("evidence"),
     };

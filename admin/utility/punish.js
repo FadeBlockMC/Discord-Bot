@@ -50,7 +50,7 @@ module.exports = {
     const duration = interaction.options.getString("duration");
     const member = interaction.guild.members.cache.get(user.id);
     const logChannel = interaction.guild.channels.cache.find(
-      (channel) => channel.name === "discord-logs"
+      (channel) => channel.name === "Discord-Punishments"
     );
 
     if (!logChannel) {
@@ -123,7 +123,7 @@ module.exports = {
               "No duration given\n"`**Muted by** <@${interaction.user.id}>`
             }`
           )
-          .setFooter({ text: `Warned by <@${interaction.user.id}>` });
+          .setFooter({ text: `Warned by ${interaction.user.tag}` });
 
         logChannel.send({ embeds: [logEmbed] });
 
@@ -147,7 +147,7 @@ module.exports = {
             .setDescription(
               `**Kicked User**:<@${user.id}>\n**Reason**: ${reason}\n**Muted by** <@${interaction.user.id}>`
             )
-            .setFooter({ text: `Kicked by <@${interaction.user.id}>` });
+            .setFooter({ text: `Kicked by ${interaction.user.tag}` });
 
           logChannel.send({ embeds: [logEmbed] });
 
@@ -168,7 +168,7 @@ module.exports = {
             .setDescription(
               `**Banned User**:<@${user.id}>\n**Reason**: ${reason}\n**Banned by** <@${interaction.user.id}>`
             )
-            .setFooter({ text: `Banned by <@${interaction.user.id}>` });
+            .setFooter({ text: `Banned by ${interaction.user.tag}` });
 
           logChannel.send({ embeds: [logEmbed] });
 
