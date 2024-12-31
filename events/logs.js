@@ -154,33 +154,22 @@ module.exports = {
       }
     });
 
-    client.on(Events.InviteCreate, async (invite) => {
-      const logChannel = await fetchLogChannel("serverLogs");
+    // client.on(Events.InviteCreate, async (invite) => {
+    //   const logChannel = await fetchLogChannel("serverLogs");
+    //   if (!logChannel) return;
 
-      const embed = new EmbedBuilder()
-        .setTitle("🔗 Invite created")
-        .setDescription(`Invite created by <@${invite.inviter.id}>.`)
-        .addFields(
-          { name: "Code", value: invite.code, inline: true },
-          { name: "Channel", value: `<#${invite.channel.id}>`, inline: true }
-        )
-        .setColor("#00FF00")
-        .setTimestamp();
+    //   const embed = new EmbedBuilder()
+    //     .setTitle("🔗 Invite created")
+    //     .setDescription(`Invite created by <@${invite.inviter.id}>.`)
+    //     .addFields(
+    //       { name: "Code", value: invite.code, inline: true },
+    //       { name: "Channel", value: `<#${invite.channel.id}>`, inline: true }
+    //     )
+    //     .setColor("#00FF00")
+    //     .setTimestamp();
 
-      logChannel.send({ embeds: [embed] });
-    });
-
-    client.on(Events.GuildBanRemove, async (ban) => {
-      const logChannel = await fetchLogChannel("userLogs");
-
-      const embed = new EmbedBuilder()
-        .setTitle("🛡️ Ban expired")
-        .setDescription(`The ban of **${ban.user.tag}** has been expired.`)
-        .setColor("#00FF00")
-        .setTimestamp();
-
-      logChannel.send({ embeds: [embed] });
-    });
+    //   logChannel.send({ embeds: [embed] });
+    // });
 
     client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
       if (
