@@ -31,7 +31,6 @@ module.exports = {
 
     client.on(Events.MessageDelete, async (message) => {
       const logChannel = await fetchLogChannel("messageLogs");
-      if (!logChannel || message.partial) return;
 
       const embed = new EmbedBuilder()
         .setTitle("🗑️ Bericht Verwijderd")
@@ -40,19 +39,19 @@ module.exports = {
         )
         .addFields(
           {
-            name: "Auteur",
-            value: `${message.author?.tag || "Onbekend"}`,
+            name: "Author",
+            value: `${message.author?.tag}`,
             inline: true,
           },
           {
             name: "Inhoud",
-            value: message.content || "*Geen inhoud*",
+            value: message.content,
             inline: true,
           }
         )
         .setColor("#FF0000")
         .setThumbnail(
-          message.author?.displayAvatarURL({ dynamic: true }) || null
+          message.author.displayAvatarURL({ dynamic: true })
         )
         .setTimestamp();
 
