@@ -161,7 +161,7 @@ module.exports = {
           .setDescription(
             newState.channelId
               ? `${newState.member.user.tag} heeft <#${newState.channel.id}> gejoined.`
-              : `${newState.member.user.tag} heeft **${newState.channel.name}** verlaten.`
+              : `${newState.member.user.tag} heeft **${newState.channel.id}** verlaten.`
           )
           .setColor(newState.channelId ? "#00FF00" : "#FF0000")
           .setThumbnail(
