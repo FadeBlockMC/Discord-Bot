@@ -3,7 +3,9 @@ const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 
 require("dotenv").config();
-const client = new Client({ intents: [GatewayIntentBits.Guilds,  GatewayIntentBits.GuildVoiceStates,] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds],
+});
 
 const token = process.env.token;
 client.login(token);
@@ -22,14 +24,14 @@ for (const folder of commandFolders) {
     const command = require(filePath);
     if ("data" in command && "execute" in command) {
       client.commands.set(command.data.name, command);
-    } else
+    } else {
       console.log(
         `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
       );
+    }
   }
 }
 
-// Load all admin command files from the admin directory
 const adminPath = path.join(__dirname, "admin");
 if (fs.existsSync(adminPath)) {
   const adminFolders = fs.readdirSync(adminPath);
@@ -54,6 +56,30 @@ if (fs.existsSync(adminPath)) {
   }
 } else {
   console.log(`[WARNING] The admin directory at ${adminPath} does not exist.`);
+}
+
+const ticketPath = path.join(__dirname, "Ticket");
+if (fs.existsSync(ticketPath)) {
+  const ticketFiles = fs
+    .readdirSync(ticketPath)
+    .filter((file) => file.endsWith(".js"));
+
+  for (const file of ticketFiles) {
+    const filePath = path.join(ticketPath, file);
+    const command = require(filePath);
+
+    if ("data" in command && "execute" in command) {
+      client.commands.set(command.data.name, command);
+    } else {
+      console.log(
+        `[WARNING] The ticket command at ${filePath} is missing a required "data" or "execute" property.`
+      );
+    }
+  }
+} else {
+  console.log(
+    `[WARNING] The ticket directory at ${ticketPath} does not exist.`
+  );
 }
 
 const eventsPath = path.join(__dirname, "events");
