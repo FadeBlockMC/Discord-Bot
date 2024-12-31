@@ -183,6 +183,13 @@ module.exports = {
     });
 
     client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
+      if (
+        oldRole.name === newRole.name &&
+        oldRole.permissions.bitfield === newRole.permissions.bitfield
+      ) {
+        return;
+      }
+
       const logChannel = await fetchLogChannel("serverLogs");
 
       const embed = new EmbedBuilder()
