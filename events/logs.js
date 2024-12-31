@@ -111,15 +111,14 @@ module.exports = {
 
     client.on(Events.ChannelDelete, async (channel) => {
       const logChannel = await fetchLogChannel("channelLogs");
-      if (!logChannel) return;
 
       const embed = new EmbedBuilder()
-        .setTitle("❌ Kanaal Verwijderd")
-        .setDescription(`Het kanaal **${channel.name}** is verwijderd.`)
+        .setTitle("❌ Channel deleted")
+        .setDescription(`The channel **${channel.name}** has been deleted.`)
         .addFields(
-          { name: "Naam", value: `${channel.name}`, inline: true },
-          { name: "Type", value: `${channel.type}`, inline: true },
-          { name: "Kanaal-ID", value: `${channel.id}`, inline: true }
+          { name: "Name", value: `${channel.name}`, inline: false },
+          { name: "Type", value: `${channel.type}`, inline: false },
+          { name: "ChannelID", value: `${channel.id}`, inline: false }
         )
         .setColor("#FF0000")
         .setTimestamp();
