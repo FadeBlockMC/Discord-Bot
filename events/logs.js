@@ -7,7 +7,6 @@ module.exports = {
     const logChannels = {
       userLogs: "1312519757819285554",
       voiceLogs: "1301248874832465972",
-      serverLogs: "1312519350653026414",
       messageLogs: "1312519486427103253",
       channelLogs: "1317489416759148605",
     };
@@ -151,23 +150,6 @@ module.exports = {
 
         logChannel.send({ embeds: [embed] });
       }
-    });
-
-    client.on(Events.GuildUpdate, async (oldGuild, newGuild) => {
-      const logChannel = await fetchLogChannel("serverLogs");
-      if (!logChannel) return;
-
-      const embed = new EmbedBuilder()
-        .setTitle("⚙️ Server Instellingen Bijgewerkt")
-        .setDescription(`De serverinstellingen zijn bijgewerkt.`)
-        .addFields(
-          { name: "Oude Naam", value: `${oldGuild.name}`, inline: true },
-          { name: "Nieuwe Naam", value: `${newGuild.name}`, inline: true }
-        )
-        .setColor("#FFA500")
-        .setTimestamp();
-
-      logChannel.send({ embeds: [embed] });
     });
   },
 };
