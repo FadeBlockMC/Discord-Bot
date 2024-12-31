@@ -76,22 +76,22 @@ module.exports = {
       logChannel.send({ embeds: [embed] });
     });
 
-    client.on(Events.ChannelCreate, async (channel) => {
-      const logChannel = await fetchLogChannel("channelLogs");
+    // client.on(Events.ChannelCreate, async (channel) => {
+    //   const logChannel = await fetchLogChannel("channelLogs");
 
-      const embed = new EmbedBuilder()
-        .setTitle("➕ Channel created")
-        .setDescription(`The channel <#${channel.id}> has been created.`)
-        .addFields(
-          { name: "name", value: `${channel.name}`, inline: false },
-          { name: "Type", value: `${channel.type}`, inline: false },
-          { name: "ChannelID", value: `${channel.id}`, inline: false }
-        )
-        .setColor("#00FF00")
-        .setTimestamp();
+    //   const embed = new EmbedBuilder()
+    //     .setTitle("➕ Channel created")
+    //     .setDescription(`The channel <#${channel.id}> has been created.`)
+    //     .addFields(
+    //       { name: "name", value: `${channel.name}`, inline: false },
+    //       { name: "Type", value: `${channel.type}`, inline: false },
+    //       { name: "ChannelID", value: `${channel.id}`, inline: false }
+    //     )
+    //     .setColor("#00FF00")
+    //     .setTimestamp();
 
-      logChannel.send({ embeds: [embed] });
-    });
+    //   logChannel.send({ embeds: [embed] });
+    // });
 
     client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       const logChannel = await fetchLogChannel("channelLogs");
