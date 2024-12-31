@@ -40,7 +40,6 @@ module.exports = {
         .addFields({
           name: "Message:",
           value: message.content,
-          inline: true,
         })
         .setColor("#FF0000")
         .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
@@ -51,34 +50,26 @@ module.exports = {
 
     client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
       const logChannel = await fetchLogChannel("messageLogs");
-      if (!logChannel || oldMessage.partial || newMessage.partial) return;
 
       const embed = new EmbedBuilder()
-        .setTitle("✏️ Bericht Bewerkt")
+        .setTitle("✏️ Message Edit")
         .setDescription(
-          `Een bericht werd bewerkt in <#${oldMessage.channel.id}>`
+          `<@${oldMessage.author.id}> Has edited a message in <#${oldMessage.channel.id}>`
         )
         .addFields(
           {
-            name: "Auteur",
-            value: `${oldMessage.author?.tag || "Onbekend"}`,
-            inline: true,
-          },
-          {
-            name: "Oude Inhoud",
-            value: oldMessage.content || "*Geen inhoud*",
+            name: "Old message",
+            value: oldMessage.content,
             inline: false,
           },
           {
-            name: "Nieuwe Inhoud",
-            value: newMessage.content || "*Geen inhoud*",
+            name: "New message",
+            value: newMessage.content || "No content",
             inline: false,
           }
         )
         .setColor("#FFFF00")
-        .setThumbnail(
-          oldMessage.author?.displayAvatarURL({ dynamic: true }) || null
-        )
+        .setThumbnail(oldMessage.author.displayAvatarURL({ dynamic: true }))
         .setTimestamp();
 
       logChannel.send({ embeds: [embed] });
@@ -86,7 +77,6 @@ module.exports = {
 
     client.on(Events.ChannelCreate, async (channel) => {
       const logChannel = await fetchLogChannel("channelLogs");
-      if (!logChannel) return;
 
       const embed = new EmbedBuilder()
         .setTitle("➕ Kanaal Aangemaakt")
