@@ -79,12 +79,12 @@ module.exports = {
       const logChannel = await fetchLogChannel("channelLogs");
 
       const embed = new EmbedBuilder()
-        .setTitle("➕ Kanaal Aangemaakt")
-        .setDescription(`Het kanaal <#${channel.id}> is aangemaakt.`)
+        .setTitle("➕ Channel created")
+        .setDescription(`The channel <#${channel.id}> has been created.`)
         .addFields(
-          { name: "Naam", value: `${channel.name}`, inline: true },
-          { name: "Type", value: `${channel.type}`, inline: true },
-          { name: "Kanaal-ID", value: `${channel.id}`, inline: true }
+          { name: "name", value: `${channel.name}`, inline: false },
+          { name: "Type", value: `${channel.type}`, inline: false },
+          { name: "ChannelID", value: `${channel.id}`, inline: false }
         )
         .setColor("#00FF00")
         .setTimestamp();
@@ -98,7 +98,7 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setTitle("🔧 Kanaal Geüpdatet")
-        .setDescription(`Het kanaal <#${newChannel.id}> is bijgewerkt.`)
+        .setDescription(`The channel <#${newChannel.id}> is bijgewerkt.`)
         .addFields(
           { name: "Oude Naam", value: `${oldChannel.name}`, inline: true },
           { name: "Nieuwe Naam", value: `${newChannel.name}`, inline: true }
