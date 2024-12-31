@@ -7,8 +7,10 @@ module.exports = {
     const logChannels = {
       userLogs: "1312519757819285554",
       voiceLogs: "1301248874832465972",
+      serverLogs: "1323675884607111309",
       messageLogs: "1312519486427103253",
       channelLogs: "1317489416759148605",
+      join_leaveLogs: "1301248839981862985",
     };
 
     const fetchLogChannel = async (type) => {
@@ -150,6 +152,115 @@ module.exports = {
 
         logChannel.send({ embeds: [embed] });
       }
+    });
+
+    client.on(Events.InviteCreate, async (invite) => {
+      const logChannel = await fetchLogChannel("serverLogs");
+
+      const embed = new EmbedBuilder()
+        .setTitle("🔗 Invite created")
+        .setDescription(`Invite created by <@${invite.inviter.id}>.`)
+        .addFields(
+          { name: "Code", value: invite.code, inline: true },
+          { name: "Channel", value: `<#${invite.channel.id}>`, inline: true }
+        )
+        .setColor("#00FF00")
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] });
+    });
+
+    client.on(Events.GuildBanRemove, async (ban) => {
+      const logChannel = await fetchLogChannel("userLogs");
+
+      const embed = new EmbedBuilder()
+        .setTitle("🛡️ Ban expired")
+        .setDescription(`The ban of **${ban.user.tag}** has been expired.`)
+        .setColor("#00FF00")
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] });
+    });
+
+    client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
+      const logChannel = await fetchLogChannel("serverLogs");
+
+      const embed = new EmbedBuilder()
+        .setTitle("🔧 Rol edited")
+        .setDescription(`Role **${newRole.name}** has been edited.`)
+        .setColor("#FFFF00")
+        .setTimestamp();
+
+      if (oldRole.name !== newRole.name) {
+        embed.addFields(
+          { name: "Old name", value: oldRole.name, inline: true },
+          { name: "New name", value: newRole.name, inline: true }
+        );
+      }
+
+      if (oldRole.permissions.bitfield !== newRole.permissions.bitfield) {
+        embed.addFields({
+          name: "Permissions had been modified",
+          value: "Permissions had been modified",
+          inline: false,
+        });
+      }
+
+      logChannel.send({ embeds: [embed] });
+    });
+
+    client.on(Events.GuildRoleDelete, async (role) => {
+      const logChannel = await fetchLogChannel("serverLogs");
+      if (!logChannel) return;
+
+      const embed = new EmbedBuilder()
+        .setTitle("❌ Rol deleted")
+        .setDescription(`Role **${role.name}** has been deleted.`)
+        .setColor("#FF0000")
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] });
+    });
+
+    client.on(Events.GuildRoleCreate, async (role) => {
+      const logChannel = await fetchLogChannel("serverLogs");
+      if (!logChannel) return;
+
+      const embed = new EmbedBuilder()
+        .setTitle("➕ Rol created")
+        .setDescription(`Role **${role.name}** has been created.`)
+        .setColor("#00FF00")
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] });
+    });
+
+    client.on(Events.GuildMemberAdd, async (member) => {
+      const logChannel = await fetchLogChannel("join_leaveLogs");
+      if (!logChannel) return;
+
+      const embed = new EmbedBuilder()
+        .setTitle("✅ New member")
+        .setDescription(`<@${member.id}> has joined the server`)
+        .setColor("#00FF00")
+        .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] });
+    });
+
+    client.on(Events.GuildMemberRemove, async (member) => {
+      const logChannel = await fetchLogChannel("join_leaveLogs");
+      if (!logChannel) return;
+
+      const embed = new EmbedBuilder()
+        .setTitle("❌ Member left")
+        .setDescription(`<@${member.id}> has left the server.`)
+        .setColor("#FF0000")
+        .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] });
     });
   },
 };

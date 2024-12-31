@@ -50,12 +50,13 @@ module.exports = {
     const duration = interaction.options.getString("duration");
     const member = interaction.guild.members.cache.get(user.id);
     const logChannel = interaction.guild.channels.cache.find(
-      (channel) => channel.name === "Discord-Punishments"
+      (channel) => channel.name === "discord-punishments"
     );
 
     if (!logChannel) {
       return interaction.reply({
-        content: "You do not have permission to use this command.",
+        content:
+          "No log channel found. Please create a channel named 'discord-punishments'.",
         ephemeral: true,
       });
     }
@@ -137,8 +138,6 @@ module.exports = {
 
       if (punishment === "Kicked") {
         if (member) {
-          await user.send({ embeds: [logEmbed] });
-
           await member.kick(reason);
 
           logEmbed = new EmbedBuilder()
@@ -150,6 +149,7 @@ module.exports = {
             .setFooter({ text: `Kicked by ${interaction.user.tag}` });
 
           logChannel.send({ embeds: [logEmbed] });
+          await user.send({ embeds: [logEmbed] });
 
           return interaction.reply({
             content: `${user.tag} has been kicked successfully.`,
@@ -171,9 +171,11 @@ module.exports = {
             .setFooter({ text: `Banned by ${interaction.user.tag}` });
 
           logChannel.send({ embeds: [logEmbed] });
+          await user.send({ embeds: [logEmbed] });
 
           return interaction.reply({
             content: `${user.tag} has been banned successfully.`,
+            ephermeral: true,
           });
         }
       }
