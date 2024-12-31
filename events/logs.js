@@ -10,8 +10,6 @@ module.exports = {
       serverLogs: "1312519350653026414",
       messageLogs: "1312519486427103253",
       channelLogs: "1317489416759148605",
-      roleLogs: "1312519350653026414",
-      banLogs: "1312519757819285554", 
     };
 
     const fetchLogChannel = async (type) => {
@@ -31,144 +29,82 @@ module.exports = {
       }
     };
 
-    // Member Join & Leave Logs
-    client.on(Events.GuildMemberAdd, async (member) => {
-      const logChannel = await fetchLogChannel("userLogs");
-      if (!logChannel) return;
+    client.on(Events.MessageDelete, async (message) => {
+      const logChannel = await fetchLogChannel("messageLogs");
+      if (!logChannel || message.partial) return;
 
       const embed = new EmbedBuilder()
-        .setTitle("✅ Nieuw Lid")
-        .setDescription(`<@${member.id}> is de server gejoined.`)
-        .setColor("#00FF00")
-        .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-        .setTimestamp();
-
-      logChannel.send({ embeds: [embed] });
-    });
-
-    client.on(Events.GuildMemberRemove, async (member) => {
-      const logChannel = await fetchLogChannel("userLogs");
-      if (!logChannel) return;
-
-      const embed = new EmbedBuilder()
-        .setTitle("❌ Lid Vertrokken")
-        .setDescription(`<@${member.id}> heeft de server verlaten.`)
+        .setTitle("🗑️ Bericht Verwijderd")
+        .setDescription(
+          `Een bericht werd verwijderd in <#${message.channel.id}>`
+        )
+        .addFields(
+          {
+            name: "Auteur",
+            value: `${message.author?.tag || "Onbekend"}`,
+            inline: true,
+          },
+          {
+            name: "Inhoud",
+            value: message.content || "*Geen inhoud*",
+            inline: true,
+          }
+        )
         .setColor("#FF0000")
-        .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+        .setThumbnail(
+          message.author?.displayAvatarURL({ dynamic: true }) || null
+        )
         .setTimestamp();
 
       logChannel.send({ embeds: [embed] });
     });
 
-    // Role & Permission Logs
-    client.on(Events.GuildRoleCreate, async (role) => {
-      const logChannel = await fetchLogChannel("roleLogs");
-      if (!logChannel) return;
+    client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+      const logChannel = await fetchLogChannel("messageLogs");
+      if (!logChannel || oldMessage.partial || newMessage.partial) return;
 
       const embed = new EmbedBuilder()
-        .setTitle("➕ Rol Aangemaakt")
-        .setDescription(`Rol **${role.name}** is aangemaakt.`)
-        .setColor("#00FF00")
-        .setTimestamp();
-
-      logChannel.send({ embeds: [embed] });
-    });
-
-    client.on(Events.GuildRoleDelete, async (role) => {
-      const logChannel = await fetchLogChannel("roleLogs");
-      if (!logChannel) return;
-
-      const embed = new EmbedBuilder()
-        .setTitle("❌ Rol Verwijderd")
-        .setDescription(`Rol **${role.name}** is verwijderd.`)
-        .setColor("#FF0000")
-        .setTimestamp();
-
-      logChannel.send({ embeds: [embed] });
-    });
-
-    client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
-      const logChannel = await fetchLogChannel("roleLogs");
-      if (!logChannel) return;
-
-      const embed = new EmbedBuilder()
-        .setTitle("🔧 Rol Bijgewerkt")
-        .setDescription(`Rol **${newRole.name}** is aangepast.`)
+        .setTitle("✏️ Bericht Bewerkt")
+        .setDescription(
+          `Een bericht werd bewerkt in <#${oldMessage.channel.id}>`
+        )
+        .addFields(
+          {
+            name: "Auteur",
+            value: `${oldMessage.author?.tag || "Onbekend"}`,
+            inline: true,
+          },
+          {
+            name: "Oude Inhoud",
+            value: oldMessage.content || "*Geen inhoud*",
+            inline: false,
+          },
+          {
+            name: "Nieuwe Inhoud",
+            value: newMessage.content || "*Geen inhoud*",
+            inline: false,
+          }
+        )
         .setColor("#FFFF00")
-        .setTimestamp();
-
-      if (oldRole.name !== newRole.name) {
-        embed.addFields(
-          { name: "Oude Naam", value: oldRole.name, inline: true },
-          { name: "Nieuwe Naam", value: newRole.name, inline: true }
-        );
-      }
-
-      if (oldRole.permissions.bitfield !== newRole.permissions.bitfield) {
-        embed.addFields({
-          name: "Permissies Gewijzigd",
-          value: "Permissies zijn aangepast.",
-          inline: false,
-        });
-      }
-
-      logChannel.send({ embeds: [embed] });
-    });
-
-    // Ban & Unban Logs
-    client.on(Events.GuildBanAdd, async (ban) => {
-      const logChannel = await fetchLogChannel("banLogs");
-      if (!logChannel) return;
-
-      const embed = new EmbedBuilder()
-        .setTitle("🔨 Gebruiker Gebanned")
-        .setDescription(`Gebruiker **${ban.user.tag}** is verbannen.`)
-        .setColor("#FF0000")
+        .setThumbnail(
+          oldMessage.author?.displayAvatarURL({ dynamic: true }) || null
+        )
         .setTimestamp();
 
       logChannel.send({ embeds: [embed] });
     });
 
-    client.on(Events.GuildBanRemove, async (ban) => {
-      const logChannel = await fetchLogChannel("banLogs");
-      if (!logChannel) return;
-
-      const embed = new EmbedBuilder()
-        .setTitle("🛡️ Ban Opgeheven")
-        .setDescription(`Ban van gebruiker **${ban.user.tag}** is opgeheven.`)
-        .setColor("#00FF00")
-        .setTimestamp();
-
-      logChannel.send({ embeds: [embed] });
-    });
-
-    // Boost Logs
-    client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
-      const logChannel = await fetchLogChannel("serverLogs");
-      if (!logChannel) return;
-
-      if (!oldMember.premiumSince && newMember.premiumSince) {
-        const embed = new EmbedBuilder()
-          .setTitle("💎 Server Geboost")
-          .setDescription(`<@${newMember.id}> heeft de server geboost!`)
-          .setColor("#00FFFF")
-          .setTimestamp();
-
-        logChannel.send({ embeds: [embed] });
-      }
-    });
-
-    // Invite Logs
-    client.on(Events.InviteCreate, async (invite) => {
+    client.on(Events.ChannelCreate, async (channel) => {
       const logChannel = await fetchLogChannel("channelLogs");
       if (!logChannel) return;
 
       const embed = new EmbedBuilder()
-        .setTitle("🔗 Invite Aangemaakt")
-        .setDescription(`Invite aangemaakt door <@${invite.inviter.id}>.`)
+        .setTitle("➕ Kanaal Aangemaakt")
+        .setDescription(`Het kanaal <#${channel.id}> is aangemaakt.`)
         .addFields(
-          { name: "Code", value: invite.code, inline: true },
-          { name: "Kanaal", value: `<#${invite.channel.id}>`, inline: true }
+          { name: "Naam", value: `${channel.name}`, inline: true },
+          { name: "Type", value: `${channel.type}`, inline: true },
+          { name: "Kanaal-ID", value: `${channel.id}`, inline: true }
         )
         .setColor("#00FF00")
         .setTimestamp();
@@ -176,14 +112,79 @@ module.exports = {
       logChannel.send({ embeds: [embed] });
     });
 
-    client.on(Events.InviteDelete, async (invite) => {
+    client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       const logChannel = await fetchLogChannel("channelLogs");
       if (!logChannel) return;
 
       const embed = new EmbedBuilder()
-        .setTitle("❌ Invite Verwijderd")
-        .setDescription(`Invite **${invite.code}** is verwijderd.`)
+        .setTitle("🔧 Kanaal Geüpdatet")
+        .setDescription(`Het kanaal <#${newChannel.id}> is bijgewerkt.`)
+        .addFields(
+          { name: "Oude Naam", value: `${oldChannel.name}`, inline: true },
+          { name: "Nieuwe Naam", value: `${newChannel.name}`, inline: true }
+        )
+        .setColor("#FFFF00")
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] });
+    });
+
+    client.on(Events.ChannelDelete, async (channel) => {
+      const logChannel = await fetchLogChannel("channelLogs");
+      if (!logChannel) return;
+
+      const embed = new EmbedBuilder()
+        .setTitle("❌ Kanaal Verwijderd")
+        .setDescription(`Het kanaal **${channel.name}** is verwijderd.`)
+        .addFields(
+          { name: "Naam", value: `${channel.name}`, inline: true },
+          { name: "Type", value: `${channel.type}`, inline: true },
+          { name: "Kanaal-ID", value: `${channel.id}`, inline: true }
+        )
         .setColor("#FF0000")
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] });
+    });
+
+    client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+      const logChannel = await fetchLogChannel("voiceLogs");
+      if (!logChannel) return;
+
+      if (oldState.channelId !== newState.channelId) {
+        const embed = new EmbedBuilder()
+          .setTitle(
+            newState.channelId
+              ? "🎙️ Voice Kanaal Gejoined"
+              : "🎙️ Voice Kanaal Verlaten"
+          )
+          .setDescription(
+            newState.channelId
+              ? `${newState.member.user.tag} heeft <#${newState.channel.id}> gejoined.`
+              : `${newState.member.user.tag} heeft **${newState.channel.name}** verlaten.`
+          )
+          .setColor(newState.channelId ? "#00FF00" : "#FF0000")
+          .setThumbnail(
+            newState.member?.user.displayAvatarURL({ dynamic: true })
+          )
+          .setTimestamp();
+
+        logChannel.send({ embeds: [embed] });
+      }
+    });
+
+    client.on(Events.GuildUpdate, async (oldGuild, newGuild) => {
+      const logChannel = await fetchLogChannel("serverLogs");
+      if (!logChannel) return;
+
+      const embed = new EmbedBuilder()
+        .setTitle("⚙️ Server Instellingen Bijgewerkt")
+        .setDescription(`De serverinstellingen zijn bijgewerkt.`)
+        .addFields(
+          { name: "Oude Naam", value: `${oldGuild.name}`, inline: true },
+          { name: "Nieuwe Naam", value: `${newGuild.name}`, inline: true }
+        )
+        .setColor("#FFA500")
         .setTimestamp();
 
       logChannel.send({ embeds: [embed] });
