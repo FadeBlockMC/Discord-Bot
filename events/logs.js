@@ -134,13 +134,13 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle(
             newState.channelId
-              ? "🎙️ Voice Kanaal Gejoined"
-              : "🎙️ Voice Kanaal Verlaten"
+              ? "🎙️ Voice channel joined"
+              : "🎙️ Voice channel leaved"
           )
           .setDescription(
             newState.channelId
-              ? `<@${newState.member.user.id}> heeft <#${newState.channel.id}> gejoined.`
-              : `<@${oldState.member.user.id}> heeft <#${oldState.channel.id}> verlaten.`
+              ? `<@${newState.member.user.id}> has <#${newState.channel.id}> joined.`
+              : `<@${oldState.member.user.id}> has <#${oldState.channel.id}> leaved.`
           )
           .setColor(newState.channelId ? "#00FF00" : "#FF0000")
           .setThumbnail(
