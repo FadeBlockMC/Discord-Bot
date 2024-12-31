@@ -161,11 +161,12 @@ module.exports = {
           .setDescription(
             newState.channelId
               ? `${newState.member.user.tag} heeft <#${newState.channel.id}> gejoined.`
-              : `${newState.member.user.tag} heeft **${newState.channel.id}** verlaten.`
+              : `${oldState.member.user.tag} heeft **${oldState.channel.id}** verlaten.`
           )
           .setColor(newState.channelId ? "#00FF00" : "#FF0000")
           .setThumbnail(
-            newState.member?.user.displayAvatarURL({ dynamic: true })
+            newState.member?.user.displayAvatarURL({ dynamic: true }) ||
+              oldState.member?.user.displayAvatarURL({ dynamic: true })
           )
           .setTimestamp();
 
