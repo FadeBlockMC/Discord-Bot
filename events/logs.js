@@ -94,14 +94,14 @@ module.exports = {
 
     client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       const logChannel = await fetchLogChannel("channelLogs");
-      if (!logChannel) return;
 
       const embed = new EmbedBuilder()
-        .setTitle("🔧 Kanaal Geüpdatet")
-        .setDescription(`The channel <#${newChannel.id}> is bijgewerkt.`)
+        .setTitle("🔧 Channel updated")
+        .setDescription(`The channel <#${newChannel.id}> has been updated.`)
         .addFields(
-          { name: "Oude Naam", value: `${oldChannel.name}`, inline: true },
-          { name: "Nieuwe Naam", value: `${newChannel.name}`, inline: true }
+          { name: "Old name", value: `${oldChannel.name}`, inline: true },
+          { name: "New name", value: `${newChannel.name}`, inline: true }
+          // Maybe add something with permissions
         )
         .setColor("#FFFF00")
         .setTimestamp();
