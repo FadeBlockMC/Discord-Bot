@@ -33,26 +33,17 @@ module.exports = {
       const logChannel = await fetchLogChannel("messageLogs");
 
       const embed = new EmbedBuilder()
-        .setTitle("🗑️ Bericht Verwijderd")
+        .setTitle("🗑️ Message Deletion")
         .setDescription(
-          `Een bericht werd verwijderd in <#${message.channel.id}>`
+          `<@${message.author.id}> Has deleted a message in <#${message.channel.id}>`
         )
-        .addFields(
-          {
-            name: "Author",
-            value: `${message.author?.tag}`,
-            inline: true,
-          },
-          {
-            name: "Inhoud",
-            value: message.content,
-            inline: true,
-          }
-        )
+        .addFields({
+          name: "Message:",
+          value: message.content,
+          inline: true,
+        })
         .setColor("#FF0000")
-        .setThumbnail(
-          message.author.displayAvatarURL({ dynamic: true })
-        )
+        .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
         .setTimestamp();
 
       logChannel.send({ embeds: [embed] });
