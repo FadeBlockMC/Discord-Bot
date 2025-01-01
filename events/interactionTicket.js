@@ -17,18 +17,29 @@ module.exports = {
   async execute(interaction) {
     if (!interaction.isButton()) return;
 
-    const [action, ticketType] = interaction.customId.split("-");
-    if (action === "create" && ticketType) {
-      await handleCreateTicket(interaction, ticketType);
-    } else if (action === "claim") {
-      await handleClaimTicket(interaction);
-    } else if (action === "close") {
-      await handleCloseTicket(interaction);
-    } else {
-      await interaction.reply({
-        content: "Invalid action or ticket type.",
-        ephemeral: true,
-      });
+    const [action, setupId, ticketType] = interaction.customId.split("-");
+
+    try {
+      if (action === "create") {
+        await handleCreateTicket(interaction, ticketType);
+      } else if (action === "claim") {
+        await handleClaimTicket(interaction);
+      } else if (action === "close") {
+        await handleCloseTicket(interaction);
+      } else {
+        await interaction.reply({
+          content: "Invalid action or ticket type.",
+          ephemeral: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error handling interaction:", error);
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({
+          content: "An error occurred while processing your request.",
+          ephemeral: true,
+        });
+      }
     }
   },
 };
@@ -49,14 +60,13 @@ async function handleCreateTicket(interaction, ticketType) {
     });
   }
 
-  const ticketChannelName = `${resolvedTicketType}-${
-    interaction.user.username
-  }-${Date.now()}`;
+  const ticketChannelName = `${resolvedTicketType}-${interaction.user.username}`;
 
   try {
     const ticketChannel = await interaction.guild.channels.create({
       name: ticketChannelName,
       type: ChannelType.GuildText,
+      parent: interaction.channel.parentId,
       permissionOverwrites: [
         {
           id: interaction.guild.roles.everyone.id,
@@ -90,21 +100,20 @@ async function handleCreateTicket(interaction, ticketType) {
         .setStyle(ButtonStyle.Danger)
     );
 
-    const embed = new EmbedBuilder()
-      .setTitle(`Welcome to your ${resolvedTicketType} ticket`)
-      .setDescription(
-        `Hello <@${interaction.user.id}>, please explain your issue in detail. A staff member will assist you shortly.`
-      )
-      .setColor("Green")
-      .setTimestamp();
-
     await ticketChannel.send({
-      embeds: [embed],
+      embeds: [
+        new EmbedBuilder()
+          .setTitle(`Welcome to your ${resolvedTicketType} ticket`)
+          .setDescription(
+            `Hello <@${interaction.user.id}>, please explain your issue in detail. A staff member will assist you shortly.`
+          )
+          .setColor("Green"),
+      ],
       components: [actionRow],
     });
 
     await interaction.reply({
-      content: `Your ${resolvedTicketType} ticket has been created: <#${ticketChannel.id}>`,
+      content: `Your ${resolvedTicketType} ticket has been created: <#${ticketChannel.id}>.`,
       ephemeral: true,
     });
   } catch (error) {
@@ -196,20 +205,15 @@ async function handleCloseTicket(interaction) {
     });
 
     setTimeout(async () => {
-      try {
-        await logChannel.send({
-          content: `Transcript for ticket ${ticketChannel.name}:`,
-          files: [transcriptFileName],
-        });
-
-        fs.unlinkSync(transcriptFileName);
-        await ticketChannel.delete();
-      } catch (error) {
-        console.error("Error closing ticket:", error);
-      }
+      await logChannel.send({
+        content: `Transcript for ticket ${ticketChannel.name}:`,
+        files: [transcriptFileName],
+      });
+      fs.unlinkSync(transcriptFileName);
+      await ticketChannel.delete();
     }, 2000);
   } catch (error) {
-    console.error("Error preparing to close ticket:", error);
+    console.error("Error closing ticket:", error);
     await interaction.reply({
       content:
         "An error occurred while closing the ticket. Please contact an administrator.",

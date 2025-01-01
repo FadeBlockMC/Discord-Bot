@@ -7,9 +7,6 @@ const {
   PermissionsBitField,
 } = require("discord.js");
 
-const TICKET_CATEGORY_ID = "1299380531468701706";
-const LOG_CHANNEL_ID = "1317957125229514832";
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("ticketsetup")
@@ -25,9 +22,7 @@ module.exports = {
     .addStringOption((option) =>
       option
         .setName("id")
-        .setDescription(
-          "The custom ID to assign to this ticket setup (e.g., support-tickets)."
-        )
+        .setDescription("The custom ID to assign to this ticket setup.")
         .setRequired(true)
     ),
   async execute(interaction) {
@@ -56,19 +51,19 @@ module.exports = {
 
       const ticketButtons = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-          .setCustomId(`create-ticket-${setupId}-general`)
+          .setCustomId(`create-${setupId}-general`)
           .setLabel("🎫 General Support")
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(`create-ticket-${setupId}-reporting`)
+          .setCustomId(`create-${setupId}-reporting`)
           .setLabel("🚨 Player Reporting")
           .setStyle(ButtonStyle.Danger),
         new ButtonBuilder()
-          .setCustomId(`create-ticket-${setupId}-punishment`)
+          .setCustomId(`create-${setupId}-punishment`)
           .setLabel("⚖️ Punishment Appeals")
           .setStyle(ButtonStyle.Secondary),
         new ButtonBuilder()
-          .setCustomId(`create-ticket-${setupId}-buycraft`)
+          .setCustomId(`create-${setupId}-buycraft`)
           .setLabel("🛒 Buycraft Issues")
           .setStyle(ButtonStyle.Success)
       );
