@@ -1,2 +1,2 @@
-# FadeblockMC
-A new created discord bot by us
+# FadeblockMC Bot
+A discord bot created for the Minecraft server FadeblocksMC.
